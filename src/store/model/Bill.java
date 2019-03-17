@@ -15,18 +15,15 @@ public class Bill {
     private int billId;
     private Date date;
     private int clientId;
-    private List<Integer> itemsId;
 
     /**
      * Creates a bill object with it's corresponding parameters
      * @param date      The bill's date
      * @param clientId  The clientId owner of the bill
-     * @param itemsId   The itemsID that were purchased
      */
-    public Bill(Date date, int clientId, List<Integer> itemsId) {
+    public Bill(Date date, int clientId) {
         this.date = date;
         this.clientId = clientId;
-        this.itemsId = itemsId;
     }
 
     /**
@@ -78,21 +75,6 @@ public class Bill {
         this.clientId = clientId;
     }
 
-    /**
-     * Gets the ids of the items that were purchased
-     * @return a List of Integers representing the ids of the items that were purchased
-     */
-    public List<Integer> getItemsId() {
-        return itemsId;
-    }
-
-    /**
-     * Sets the ids of the items that were purchased
-     * @param itemsId a List of Integers representing the ids of the items that were purchased
-     */
-    public void setItemsId(List<Integer> itemsId) {
-        this.itemsId = itemsId;
-    }
 
 
     /**
@@ -105,7 +87,6 @@ public class Bill {
                 "billId=" + billId +
                 ", date=" + date +
                 ", clientId=" + clientId +
-                ", itemsId=" + itemsId +
                 '}';
     }
 }

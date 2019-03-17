@@ -21,14 +21,12 @@ import java.util.stream.Collectors;
  */
 public class MySqlClientBill implements BillDao {
 
-    final String INSERT = "INSERT INTO bill( date, client_id, items_id)" +
-            "VALUES(?,?,?)";
-    final String UPDATE = "UPDATE bill SET date = ?, client_id = ?, items_id = " +
-            "WHERE id_bill = ?";
+    final String INSERT = "INSERT INTO bill( date, client_id)" +
+            "VALUES(?,?)";
+    final String UPDATE = "UPDATE bill SET date = ?, client_id = ? WHERE id_bill = ?";
     final String DELETE = "DELETE FROM bill WHERE id_bill = ?";
     final String GETALL = "SELECT  * FROM bill";
-    final String GETONE = "SELECT * FROM bill" +
-            "WHERE id_bill = ?";
+    final String GETONE = "SELECT * FROM bill WHERE id_bill = ?";
 
 
     private Connection conn;
@@ -52,22 +50,9 @@ public class MySqlClientBill implements BillDao {
         ResultSet rs = null;
 
         try {
-
-            Integer[] array = bill.getItemsId().toArray(new Integer[bill.getItemsId().size()]);
-            for(Integer a: array){
-                System.out.println(a);
-            }
-
-            System.out.println("crea array");
-            Array arraySql = conn.createArrayOf("INTEGER", array);
-            //String arraySql = Arrays.toString(array);
-            //Array arraySql = conn.createArrayOf("INTEGER",array);
-            System.out.println("crea array sql");
             stat = conn.prepareStatement(INSERT);
             stat.setDate(1, new Date(bill.getDate().getTime()));
             stat.setInt(2, bill.getClientId());
-            stat.setArray(3, arraySql);
-            System.out.println("pasa");
 
 
             if (stat.executeUpdate() == 0) {
@@ -96,12 +81,9 @@ public class MySqlClientBill implements BillDao {
     public void update(Bill a) throws DAOException{
         PreparedStatement stat = null;
         try {
-            Integer[] array = a.getItemsId().toArray(new Integer[a.getItemsId().size()]);
-            Array arraySql = conn.createArrayOf("BIGINT",array);
             stat = conn.prepareStatement(UPDATE);
             stat.setDate(1, new Date(a.getDate().getTime()));
             stat.setInt(2, a.getClientId());
-            stat.setArray(3, arraySql);
             if (stat.executeUpdate() == 0) {
                 throw new DAOException("Changes may not be saved");
             }
@@ -159,13 +141,8 @@ public class MySqlClientBill implements BillDao {
     private Bill convert(ResultSet rs) throws SQLException{
         Date date = rs.getDate("date");
         int client_id = rs.getInt("client_id");
-        Array array = rs.getArray("items_id");
 
-        Integer[] itemsL = (Integer[]) array.getArray();
-        ArrayList<Integer> items = new ArrayList<>();
-        Collections.addAll(items,itemsL);
-
-        Bill bill = new Bill(date,client_id, items);
+        Bill bill = new Bill(date,client_id);
         bill.setBillId(rs.getInt(1));
 
         return bill;
@@ -252,4 +229,17 @@ public class MySqlClientBill implements BillDao {
         }
         return a;
     }
+
+    /*public static void main(String[] args) throws SQLException, DAOException {
+        Connection conn = null;
+
+            conn = DriverManager.getConnection("jdbc:mysql://localhost/storedb", "root", "1234");
+            BillDao dao = new MySqlClientBill(conn);
+            Bill bill = new Bill(new Date(0,1,11),3);
+            dao.create(bill);
+            List<Bill> bills = dao.getAll();
+            for (Bill b: bills){
+                System.out.println(b.toString());
+            }
+    }*/
 }

@@ -10,9 +10,11 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) throws SQLException, DAOException {
+
         MySqlManager msq = new MySqlManager("localhost","root","1234", "storedb");
 
-        //example on how to do CRUD on client
+        
+        /*
         Client c = new Client("Geoffrey","Hinton", "Male",new Date(45,12,6),"Married");
         //msq.getClientDao().create(c); adds c to the client table
 
@@ -27,7 +29,7 @@ public class Main {
         List<Client> clients = msq.getClientDao().getAll();
         for (Client a: clients){
          System.out.println(a.toString());
-        }
+        }*/
 
 
 
