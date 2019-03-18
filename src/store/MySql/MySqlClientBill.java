@@ -3,17 +3,10 @@ package store.MySql;
 import store.DAOException;
 import store.dao.BillDao;
 import store.model.Bill;
-import store.model.BillItem;
-import store.model.BillItemId;
-import store.model.Client;
 
-import javax.sql.rowset.serial.SerialArray;
 import java.sql.*;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 /**
  * This class realize CRUD operations over the bill
@@ -313,7 +306,7 @@ public class MySqlClientBill implements BillDao {
         return a;
     }
 
-    public static void main(String[] args) throws SQLException, DAOException {
+    /*public static void main(String[] args) throws SQLException, DAOException {
         Connection conn = null;
 
             conn = DriverManager.getConnection("jdbc:mysql://localhost/storedb", "root", "1234");
@@ -327,5 +320,5 @@ public class MySqlClientBill implements BillDao {
             for (Bill b: bills){
                 System.out.println(b.toString());
             }
-    }
+    }*/
 }
