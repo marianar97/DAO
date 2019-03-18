@@ -4,6 +4,11 @@ public class BillItemId {
     private int id_bill;
     private int id_item;
 
+    public BillItemId(int id_bill, int id_item) {
+        this.id_bill = id_bill;
+        this.id_item = id_item;
+    }
+
     public int getId_bill() {
         return id_bill;
     }
@@ -20,10 +25,7 @@ public class BillItemId {
         this.id_item = id_item;
     }
 
-    public BillItemId(int id_bill, int id_item) {
-        this.id_bill = id_bill;
-        this.id_item = id_item;
-    }
+
 
     @Override
     public String toString() {

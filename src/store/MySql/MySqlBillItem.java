@@ -21,7 +21,8 @@ public class MySqlBillItem implements BillItemDao {
     final String UPDATE = "UPDATE bill_item SET id_bill = ?, id_item = ?  WHERE id_bill = ? AND id_item = ?";
     final String DELETE = "DELETE FROM bill_item WHERE id_bill = ? AND id_item = ? ";
     final String GETALL = "SELECT * FROM bill_item";
-    final String GETONE = "SELECT * FROM bill WHERE id_bill = ? AND id_item = ?";
+    final String GETONE = "SELECT * FROM bill_item WHERE id_bill = ? AND id_item = ?";
+    final String GETBYBILLID = "SELECT id_item FROM bill_item WHERE id_bill = ?";
 
     private Connection conn;
 
@@ -36,12 +37,16 @@ public class MySqlBillItem implements BillItemDao {
 
         try {
             stat = conn.prepareStatement(INSERT);
-            stat.setInt(1,a.getId().getId_bill());
+            stat.setInt(1, a.getId().getId_bill());
             stat.setInt(2, a.getId().getId_item());
+
+            System.out.println("id_bill " +  a.getId().getId_bill());
+            System.out.println("id_item " +  a.getId().getId_item());
 
             if(stat.executeUpdate()==0){
                 throw new DAOException("Could not add the bill_item register");
             }
+            System.out.println("pasa");
 
         } catch (SQLException e){
             throw new DAOException("Could not add the bill_item register");
@@ -188,5 +193,41 @@ public class MySqlBillItem implements BillItemDao {
             }
         }
         return bi;
+    }
+
+    public List<Integer> getItems(int billId) throws DAOException{
+        PreparedStatement stat = null;
+        ResultSet rs = null;
+        List<Integer> items = new ArrayList<>();
+
+        try{
+            stat = conn.prepareStatement(GETBYBILLID);
+            rs = stat.executeQuery();
+            while(rs.next()){
+                items.add(rs.getInt("id_item"));
+
+            }
+        }catch (SQLException e){
+            throw new DAOException("Error in SQL", e);
+        } finally {
+            if(rs != null) {
+                try{
+                    rs.close();
+                }catch (SQLException e){
+                    new DAOException("Error in SQL", e);
+                }
+            }
+
+            if (stat != null){
+                try{
+                    stat.close();
+                } catch(SQLException e) {
+                    new DAOException("Error in SQL", e);
+
+                }
+            }
+        }
+        return items;
+
     }
 }

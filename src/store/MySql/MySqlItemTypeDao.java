@@ -17,8 +17,7 @@ import java.util.List;
 
 public class MySqlItemTypeDao implements ItemTypeDao {
 
-    final String INSERT = "INSERT INTO item_type (description)" +
-            "VALUES(?)";
+    final String INSERT = "INSERT INTO item_type (description) VALUES(?)";
     final String UPDATE = "UPDATE item_type SET description = ?" +
             "WHERE id_item_type = ?";
     final String DELETE = "DELETE FROM item_type WHERE id_item_type = ?";

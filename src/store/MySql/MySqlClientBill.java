@@ -3,6 +3,8 @@ package store.MySql;
 import store.DAOException;
 import store.dao.BillDao;
 import store.model.Bill;
+import store.model.BillItem;
+import store.model.BillItemId;
 import store.model.Client;
 
 import javax.sql.rowset.serial.SerialArray;
@@ -21,13 +23,15 @@ import java.util.stream.Collectors;
  */
 public class MySqlClientBill implements BillDao {
 
-    final String INSERT = "INSERT INTO bill( date, client_id)" +
-            "VALUES(?,?)";
+    final String INSERT = "INSERT INTO bill( date, client_id) VALUES(?,?)";
     final String UPDATE = "UPDATE bill SET date = ?, client_id = ? WHERE id_bill = ?";
     final String DELETE = "DELETE FROM bill WHERE id_bill = ?";
     final String GETALL = "SELECT  * FROM bill";
     final String GETONE = "SELECT * FROM bill WHERE id_bill = ?";
 
+    final String GETBYBILL = "SELECT * FROM bill_item WHERE id_bill= ?";
+    final String INSERTBYBILL = "INSERT INTO bill_item(id_bill, id_item) VALUES(?,?)";
+    final String LASTBILLID = "SELECT * FROM Bill ORDER BY id_bill DESC LIMIT 1";
 
     private Connection conn;
 
@@ -47,7 +51,7 @@ public class MySqlClientBill implements BillDao {
     @Override
     public void create(Bill bill) throws DAOException {
         PreparedStatement stat = null;
-        ResultSet rs = null;
+        PreparedStatement stat2 = null;
 
         try {
             stat = conn.prepareStatement(INSERT);
@@ -68,6 +72,53 @@ public class MySqlClientBill implements BillDao {
                 }catch (SQLException e){
                     throw new DAOException("Error in SQL", e );
                 }
+            }
+        }
+        try{
+            stat2 = conn.prepareStatement(LASTBILLID);
+            ResultSet rs = stat2.executeQuery();
+            if(rs.next()){
+                int idBill = rs.getInt("id_bill");
+                for (int itemType: bill.getItems()){
+                    insertBillItem(idBill, itemType);
+                }
+            }
+        } catch (SQLException e){
+            throw new DAOException("Error getting bill ID", e);
+        } finally {
+            if (stat!= null) {
+                try{
+                    stat.close();
+                }catch (SQLException e){
+                    throw new DAOException("Error in SQL", e );
+                }
+            }
+
+        }
+    }
+
+    public void insertBillItem(int billId, int itemId) throws DAOException {
+        PreparedStatement stat = null;
+
+        try {
+            stat = conn.prepareStatement(INSERTBYBILL);
+            stat.setInt(1, billId);
+            stat.setInt(2, itemId);
+            System.out.println("billId" + billId);
+            System.out.println("itemId" + itemId);
+            if (stat.executeUpdate() == 0) {
+                throw new DAOException("Error in sql");
+            }
+        }catch (SQLException e) {
+            throw new DAOException("ERROR",e);
+        }finally{
+            if (stat!= null) {
+                try{
+                    stat.close();
+                }catch (SQLException e){
+                    throw new DAOException("Error in SQL", e );
+                }
+
             }
         }
     }
@@ -131,6 +182,37 @@ public class MySqlClientBill implements BillDao {
         }
     }
 
+    private List<Integer> items(int idBill) throws DAOException{
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        List<Integer> items = new ArrayList<>();
+
+        try {
+            statement = conn.prepareStatement(GETBYBILL);
+            statement.setInt(1, idBill);
+            rs = statement.executeQuery();
+            while (rs.next()) {
+                items.add(rs.getInt("id_item"));
+            }
+
+        }catch(SQLException e){
+            throw new DAOException("Error in SQL", e);
+
+        }finally{
+            if (rs!= null) {
+                try{
+                    rs.close();
+                }catch (SQLException e){
+                    throw new DAOException("Error in SQL", e );
+                }
+            }
+        }
+
+        return items;
+
+
+    }
+
     /**
      * This method gets the bill´s attributes from the database and use them
      * to create a bill object
@@ -138,13 +220,14 @@ public class MySqlClientBill implements BillDao {
      * @return A bill object
      * @throws SQLException if bill´s attributes could not be taken from the ResultSet
      */
-    private Bill convert(ResultSet rs) throws SQLException{
+    private Bill convert(ResultSet rs) throws SQLException, DAOException {
+        int id = rs.getInt("id_bill");
+        System.out.println("ID BILL"+id);
         Date date = rs.getDate("date");
         int client_id = rs.getInt("client_id");
-
-        Bill bill = new Bill(date,client_id);
-        bill.setBillId(rs.getInt(1));
-
+        List<Integer> items = items(id);
+        Bill bill = new Bill(date,client_id, items);
+        bill.setBillId(id);
         return bill;
     }
 
@@ -230,16 +313,19 @@ public class MySqlClientBill implements BillDao {
         return a;
     }
 
-    /*public static void main(String[] args) throws SQLException, DAOException {
+    public static void main(String[] args) throws SQLException, DAOException {
         Connection conn = null;
 
             conn = DriverManager.getConnection("jdbc:mysql://localhost/storedb", "root", "1234");
             BillDao dao = new MySqlClientBill(conn);
-            Bill bill = new Bill(new Date(0,1,11),3);
-            dao.create(bill);
+            List<Integer> items = new ArrayList<>();
+            items.add(1);
+            Bill bill = new Bill(new Date(0,1,11),12,items);
+            //dao.create(bill);
+
             List<Bill> bills = dao.getAll();
             for (Bill b: bills){
                 System.out.println(b.toString());
             }
-    }*/
+    }
 }

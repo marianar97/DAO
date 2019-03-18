@@ -1,5 +1,6 @@
 package store.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
 
@@ -15,15 +16,18 @@ public class Bill {
     private int billId;
     private Date date;
     private int clientId;
+    private List<Integer> items;
 
     /**
      * Creates a bill object with it's corresponding parameters
      * @param date      The bill's date
      * @param clientId  The clientId owner of the bill
      */
-    public Bill(Date date, int clientId) {
+    public Bill(Date date, int clientId, List<Integer> items) {
         this.date = date;
         this.clientId = clientId;
+        this.items = items;
+
     }
 
     /**
@@ -75,7 +79,13 @@ public class Bill {
         this.clientId = clientId;
     }
 
+    public List<Integer> getItems() {
+        return items;
+    }
 
+    public void setItems(List<Integer> items) {
+        this.items = items;
+    }
 
     /**
      * This methods return the object's attributes as a String
@@ -87,6 +97,7 @@ public class Bill {
                 "billId=" + billId +
                 ", date=" + date +
                 ", clientId=" + clientId +
+                ", items=" + items +
                 '}';
     }
 }

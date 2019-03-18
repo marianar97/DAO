@@ -17,8 +17,7 @@ import java.util.List;
 
 public class MySqlItemDao implements ItemDao {
 
-    final String INSERT = "INSERT INTO item ( item_type, description, unit_value)" +
-            "VALUES(?,?,?)";
+    final String INSERT = "INSERT INTO item ( item_type, description, unit_value) VALUES(?,?,?)";
     final String UPDATE = "UPDATE item SET item_type = ?, description = ?, unit_value = ? WHERE id_item = ? ";
     final String DELETE = "DELETE FROM item WHERE id_item = ?";
     final String GETALL = "SELECT  * FROM item";
